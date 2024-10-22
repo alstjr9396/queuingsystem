@@ -1,5 +1,7 @@
 package me.minseok.redis.controller;
 
+import jakarta.servlet.http.HttpSession;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import me.minseok.redis.domain.entity.RedisHashMember;
 import me.minseok.redis.domain.entity.Member;
@@ -31,6 +33,16 @@ public class MemberController {
     @GetMapping("/redis-members/{id}")
     public RedisHashMember getMember2(@PathVariable Long id) {
         return memberService.getMember2(id);
+    }
+
+    @GetMapping("/session-visits")
+    public Map<String, String> home(HttpSession session) {
+        Integer visitCount = (Integer) session.getAttribute("visits");
+        if (visitCount == null) {
+            visitCount = 0;
+        }
+        session.setAttribute("visits", ++visitCount);
+        return Map.of("session id", session.getId(), "visits", visitCount.toString());
     }
 
 }
