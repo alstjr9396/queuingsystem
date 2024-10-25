@@ -91,7 +91,7 @@ class MemberServiceTest {
 
     @Test
     void deleteById() {
-        when(memberService.deleteById(1L)).thenReturn(Mono.just(1));
+        when(memberService.deleteById(1L)).thenReturn(Mono.empty());
 
         webTestClient.delete().uri("/members/1")
                 .exchange()
