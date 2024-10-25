@@ -31,6 +31,10 @@ public class MemberService {
         return memberR2dbcRepository.deleteById(id);
     }
 
+    public Mono<Void> deleteByName(String name) {
+        return memberR2dbcRepository.deleteByName(name);
+    }
+
     public Mono<Member> update(Long id, String name, String email) {
         return memberR2dbcRepository.findById(id)
                 .flatMap(u -> {
