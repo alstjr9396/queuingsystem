@@ -1,4 +1,4 @@
 package me.minseok.queueing.dto;
 
-public record AllowedMemberResponse(Boolean isAllowed) {
+public record AllowedMemberResponse(Boolean allowed) {
 }

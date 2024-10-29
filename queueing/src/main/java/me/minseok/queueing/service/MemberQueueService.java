@@ -2,6 +2,9 @@ package me.minseok.queueing.service;
 
 import static me.minseok.queueing.exception.ErrorCode.QUEUE_ALREADY_REGISTER_MEMBER;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,10 +52,35 @@ public class MemberQueueService {
                 .map(rank -> rank >= 0);
     }
 
+    public Mono<Boolean> isAllowedByToken(final String queue, final Long memberId, final String token) {
+        return this.generateToken(queue, memberId)
+                .filter(gen -> gen.equalsIgnoreCase(token))
+                .map(i -> true)
+                .defaultIfEmpty(false);
+    }
+
     public Mono<Long> getRank(final String queue, final Long memberId) {
         return reactiveRedisTemplate.opsForZSet().rank(USER_QUEUE_WAIT_KEY.formatted(queue), memberId.toString())
                 .defaultIfEmpty(-1L)
                 .map(rank -> rank >= 0 ? rank + 1 : rank);
+    }
+
+    public Mono<String> generateToken(final String queue, final Long memberId) {
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+            String input = "member-queue-%s-%d".formatted(queue, memberId);
+            byte[] encodeHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte aByte : encodeHash) {
+                hexString.append(String.format("%02x", aByte));
+            }
+
+            return Mono.just(hexString.toString());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Scheduled(initialDelay = 5000, fixedDelay = 10000)

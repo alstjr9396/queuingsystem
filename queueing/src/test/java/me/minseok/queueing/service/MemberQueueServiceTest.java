@@ -9,6 +9,7 @@ import org.springframework.data.redis.connection.ReactiveRedisConnection;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import reactor.test.StepVerifier;
+import reactor.test.StepVerifier.Step;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -120,6 +121,27 @@ class MemberQueueServiceTest {
     void emptyRank() {
         StepVerifier.create(memberQueueService.getRank("default", 100L))
                 .expectNext(-1L)
+                .verifyComplete();
+    }
+
+    @Test
+    void isAllowedByToken() {
+        StepVerifier.create(memberQueueService.isAllowedByToken("default", 100L, "515bfc87eed82ed231789829cd818428afa7bbac031d62ba9d05254f9bd1689d"))
+                .expectNext(true)
+                .verifyComplete();
+    }
+
+    @Test
+    void isNotAllowedByToken() {
+        StepVerifier.create(memberQueueService.isAllowedByToken("default", 100L, ""))
+                .expectNext(false)
+                .verifyComplete();
+    }
+
+    @Test
+    void generateToken() {
+        StepVerifier.create(memberQueueService.generateToken("default", 100L))
+                .expectNext("515bfc87eed82ed231789829cd818428afa7bbac031d62ba9d05254f9bd1689d")
                 .verifyComplete();
     }
 }
