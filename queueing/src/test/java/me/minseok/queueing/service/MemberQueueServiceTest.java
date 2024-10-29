@@ -107,4 +107,19 @@ class MemberQueueServiceTest {
                 .expectNext(true)
                 .verifyComplete();
     }
+
+    @Test
+    void getRank() {
+        StepVerifier.create(memberQueueService.registerWaitQueue("default", 100L)
+                        .then(memberQueueService.getRank("default", 100L)))
+                .expectNext(1L)
+                .verifyComplete();
+    }
+
+    @Test
+    void emptyRank() {
+        StepVerifier.create(memberQueueService.getRank("default", 100L))
+                .expectNext(-1L)
+                .verifyComplete();
+    }
 }

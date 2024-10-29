@@ -3,6 +3,7 @@ package me.minseok.queueing.controller;
 import lombok.RequiredArgsConstructor;
 import me.minseok.queueing.dto.AllowMemberResponse;
 import me.minseok.queueing.dto.AllowedMemberResponse;
+import me.minseok.queueing.dto.RankNumberResponse;
 import me.minseok.queueing.dto.RegisterMemberResponse;
 import me.minseok.queueing.service.MemberQueueService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,13 @@ public class MemberQueueController {
             @RequestParam(name = "member_id") Long memberId) {
         return memberQueueService.isAllowed(queue, memberId)
                 .map(AllowedMemberResponse::new);
+    }
+
+    @GetMapping("/rank")
+    public Mono<RankNumberResponse> getRank(@RequestParam(name = "queue", defaultValue = "default") String queue,
+            @RequestParam(name = "member_id") Long memberId) {
+        return memberQueueService.getRank(queue, memberId)
+                .map(RankNumberResponse::new);
     }
 
 }
